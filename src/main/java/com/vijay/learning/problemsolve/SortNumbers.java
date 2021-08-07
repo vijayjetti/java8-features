@@ -1,4 +1,4 @@
-package com.vijay.learning.temp;
+package com.vijay.learning.problemsolve;
 
 public class SortNumbers {
     public static void main(String[] args) {

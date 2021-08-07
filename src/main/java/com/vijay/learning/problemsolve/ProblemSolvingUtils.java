@@ -66,6 +66,20 @@ public class ProblemSolvingUtils {
     public static boolean isPalindrome(String input) {
         return input.equals(reverse(input));
     }
+    public static boolean isEfficientPalindrome(String input) {
+        char[] chars = input.toCharArray();
+        int j = chars.length - 1;
+        for (int i = 0; i <= j; i++) {
+            if (chars[i] == chars[j]) {
+                log.info("Equal Chars: {} && {}", chars[i], chars[j]);
+            } else {
+                log.info("Non Equal Chars: {} && {}", chars[i], chars[j]);
+                return false;
+            }
+            j = j - 1;
+        }
+        return true;
+    }
 
     public static int reverse(int number) {
         // 1234
@@ -160,10 +174,9 @@ public class ProblemSolvingUtils {
     }
 
     public static Character findFirstNonRepeatedCharacter(String name) {
-        Map<Character, Long> countMap = name.chars().mapToObj(ch -> (char) ch).collect(Collectors.groupingBy(ch -> ch, Collectors.counting()));
+        Map<Character, Long> countMap = new LinkedHashMap<>(name.chars().mapToObj(ch -> (char) ch).collect(Collectors.groupingBy(ch -> ch, Collectors.counting())));
         log.info("countMap: {}", countMap);
-        Map<Character, Long> myMap = new LinkedHashMap<>(countMap);
-        return myMap.entrySet().stream().filter(entry -> entry.getValue() == 1).map(Map.Entry::getKey).findFirst().orElseThrow(RuntimeException::new);
+        return countMap.entrySet().stream().filter(entry -> entry.getValue() == 1).map(Map.Entry::getKey).findFirst().orElseThrow(RuntimeException::new);
     }
     public static void swapStrings(String s1, String s2) {
         s1 = s1 + s2;
@@ -222,22 +235,6 @@ public class ProblemSolvingUtils {
         chars[j] = tmp;
     }
 
-    /*public static int[] altTab(int input1, int input2, int[] input3) {
-        if(input1 !=input3.length){
-            throw new IllegalArgumentException("Input length doesn't match");
-        }
-        List<Integer> list = Arrays.stream(input3).boxed().collect(Collectors.toList());
-        //  int[] array2 = {4, 1, 3, 7, 6, 8, 5, 2, 10, 9};
-        //log.info("List: {}", list);
-        //log.info("input1 {} ", input1);
-        //log.info("input3 length: {} ", input3.length);
-        Integer removed = list.remove(input2-1);
-        //log.info("removed element {}", removed);
-        log.info("After remove : {}", list);
-        list.add(0, removed);
-        //log.info("Alt tab : {}", list);
-        return list.stream().mapToInt(i->i).toArray();
-    }*/
     public static int[] altTab(int input1, int input2, int[] input3) {
         if (input1 != input3.length) {
             throw new IllegalArgumentException("Input length doesn't match");

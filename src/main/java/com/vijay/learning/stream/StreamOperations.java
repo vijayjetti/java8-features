@@ -24,6 +24,9 @@ public class StreamOperations {
        // return Collections.max(numbers );
         return numbers.stream().mapToInt(num -> num).max().getAsInt();
     }
+    public static int findMaxNumber(int[] numbers) {
+        return Arrays.stream(numbers).boxed().mapToInt(num -> num).max().getAsInt();
+    }
     public static List<Customer> getUnique(List<Customer> customers) {
         return customers.stream().distinct().collect(Collectors.toList());
     }
@@ -158,6 +161,14 @@ public class StreamOperations {
     /**
      * Stream Operations on Employee problem solving
      **/
+    // Sort by employee age and find max age
+    public static void sortEmployeeByAge(List<Employee> employees) {
+        List<Employee> result = employees.stream().sorted(Comparator.comparing(Employee::getAge)).collect(Collectors.toList());
+        log.info("Sort Employee: {}", result);
+        Integer maxAge = employees.stream().mapToInt(Employee::getAge).max().getAsInt();
+        log.info("Max age: {}", maxAge);
+    }
+
     // 0. Sort by emp name with descending order
     public static List<Employee> sortEmployeeByName(List<Employee> employees){
         return  employees.stream().sorted(Comparator.comparing(Employee::getName, Comparator.reverseOrder())).collect(Collectors.toList());
@@ -342,6 +353,7 @@ public class StreamOperations {
         Matcher matcher = pattern.matcher(string);
         return matcher.find();
     }
+    /** Asked in Mphasis**/
     public static void findMostDuplicate(List<Integer> numbers) {
         Map<Integer, Long> countMap = numbers.stream().collect(Collectors.groupingBy(Math::abs, Collectors.counting()));
         log.info("count Map: {}", countMap);

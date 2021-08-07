@@ -14,6 +14,7 @@ import static com.vijay.learning.utils.ApplicationUtils.buildEmployee;
 public class StreamEmpMain {
     public static void main(String[] args) {
         List<Employee> employees = constructEmployees();
+        sortEmployeeByAge(employees);
         log.info("Sort employee descending name : {}", sortEmployeeByName(employees));
         log.info("Employees Count {}", employees.size());
         log.info("Male Employee Count: {}", findEmpCount(employees, "Male"));

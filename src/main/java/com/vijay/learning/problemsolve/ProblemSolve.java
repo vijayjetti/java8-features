@@ -13,6 +13,9 @@ public class ProblemSolve {
         log.info("Get Fibonacci Series: {}", getFibonacciSeries(6));
         log.info("Is prime: {}", isPrime(17));
         log.info("Get Prime numbers : {}", getPrimeNumbers(100));
+        log.info("Is Efficient Palindrome : {}", isEfficientPalindrome("VIJAYAYABJIV"));
+        log.info("Is Efficient Palindrome : {}", isEfficientPalindrome("ANNa"));
+        log.info("Is Efficient Palindrome : {}", isEfficientPalindrome("A"));
         log.info("Is Palindrome : {}", isPalindrome("VIJAYA Jetti itteJ AYAJIV"));
         log.info("Is Number Palindrome : {}", isPalindrome(123213));
         log.info("Is Armstrong : {}", isArmstrong(153));
@@ -28,7 +31,7 @@ public class ProblemSolve {
         log.info("is Armstrong Number: {}", isArmStrongNumber(1));
         log.info("is Armstrong Number: {}", isArmStrongNumber(30));
         log.info("is Armstrong Number: {}", isArmStrongNumber(407));
-        log.info("findFirstNonRepeatedCharacter: {}", findFirstNonRepeatedCharacter("simplest"));
+        log.info("findFirstNonRepeatedCharacter: {}", findFirstNonRepeatedCharacter("analogy"));
         /*log.info("Minimum Swap Count for Palindrome {}", swapCountForPalindrome(""));
         log.info("Minimum Swap Count for Palindrome {}", swapCountForPalindrome("abab"));
         log.info("Minimum Swap Count for Palindrome {}", swapCountForPalindrome("abcbac"));
@@ -45,6 +48,8 @@ public class ProblemSolve {
         swapStrings("Sai", "Krishna");
         // Will give compile time error due to ambiguity of char[] or  string
         //System.out.println(null);
+
+        //addZeroAfterTwoNumbers(10);
 
     }
 }
