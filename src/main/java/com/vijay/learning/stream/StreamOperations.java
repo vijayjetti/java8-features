@@ -6,6 +6,7 @@ import com.vijay.learning.model.Employee;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
@@ -21,12 +22,19 @@ import java.util.stream.Stream;
 public class StreamOperations {
 
     public static Integer findMaxNumber(List<Integer> numbers) {
-       // return Collections.max(numbers );
-        return numbers.stream().mapToInt(num -> num).max().getAsInt();
+        return Collections.max(numbers);
+//        return numbers.stream().max(Comparator.naturalOrder()).orElse(0);
     }
+
+    //get list of Customer names who's age is lesser than 30
+    public static List<String> getYoungCustomerNames(List<Customer> customers) {
+        return customers.stream().filter(customer -> customer.getAge() < 18).map(Customer::getName).distinct().collect(Collectors.toList());
+    }
+
     public static int findMaxNumber(int[] numbers) {
         return Arrays.stream(numbers).boxed().mapToInt(num -> num).max().getAsInt();
     }
+
     public static List<Customer> getUnique(List<Customer> customers) {
         return customers.stream().distinct().collect(Collectors.toList());
     }
@@ -35,7 +43,7 @@ public class StreamOperations {
      * get list of Customer names who's age is lesser than 30
      **/
     public static List<String> getYoungCustomers(List<Customer> customers) {
-        List<String> result = customers.stream().filter(customer -> customer.getAge() < 30).map(Customer::getName).collect(Collectors.toList());
+        List<String> result = customers.stream().filter(customer -> customer.getAge() < 30).map(Customer::getName).distinct().collect(Collectors.toList());
         log.info("Customers: {}", customers);
         return result;
     }
@@ -44,19 +52,12 @@ public class StreamOperations {
      * get list of Customer names who's age is lesser than 30
      **/
     public static int getYoungCustomerCount(List<Customer> customers) {
-        return (int) customers.stream().filter(customer -> customer.getAge() < 30).count();
+        return getYoungCustomers(customers).size();
     }
 
     public static Customer getAnyCustWithNameMatch(List<Customer> customers, String name) {
         //customers.stream().anyMatch(Customer -> Customer.getName().equals(name)) // returns boolean
-        Optional<Customer> emptyCustomer = Optional.empty();
-        Optional<Customer> customer = customers.stream().filter(emp -> emp.getName().equals(name)).findAny();
-        /*if (customer.isPresent()){
-            return customer.get();
-        } else {
-            return Customer.builder().build();
-        }*/
-        return customer.orElse(Customer.builder().build());
+        return customers.stream().filter(emp -> emp.getName().equals(name)).findAny().orElse(Customer.builder().build());
     }
 
     /**
@@ -64,6 +65,10 @@ public class StreamOperations {
      **/ // find max age customer later
     public static void arithMeticOperations(List<Customer> customers) {
         log.info("Max Age: {}", customers.stream().mapToInt(Customer::getAge).max());
+    }
+
+    public static Customer findOldestCustomer(List<Customer> customers) {
+        return customers.stream().max(Comparator.comparing(Customer::getAge)).orElse(Customer.builder().build());
     }
 
     public static List<Customer> sortByNameAndId(List<Customer> customers) {
@@ -76,14 +81,25 @@ public class StreamOperations {
         return customers.stream().map(Customer::getName).distinct().collect(Collectors.joining("|"));
     }
 
-    public static Map<String, List<Customer>> groupByCustomer(List<Customer> customers) {
-        return customers.stream().collect(Collectors.groupingBy(Customer::getName));
+    public static Map<String, Long> getCustomerNameWithCount(List<Customer> customers) {
+        return customers.stream().collect(Collectors.groupingBy(Customer::getName, Collectors.counting()));
     }
 
-    public static Set<Integer> getPincodes(List<Customer> customers) {
-        return customers.stream().flatMap(customer -> customer.getAddresses().stream()).map(Address::getPin).collect(Collectors.toSet());
+    public static Map<Integer, Long> getNumberCount(List<Integer> numbers) {
+        return numbers.stream().collect(Collectors.groupingBy(number -> number, Collectors.counting()));
+    }
+
+    public static List<Integer> getPinCodes(List<Customer> customers) {
         // address null check
-        //return customers.stream().map(Customer::getAddresses).filter(CollectionUtils::isNotEmpty).flatMap(Collection::stream).map(Address::getPin).collect(Collectors.toSet());
+        return customers.stream().filter(customer -> CollectionUtils.isNotEmpty(customer.getAddresses())).flatMapToInt(customer -> customer.getAddresses().stream().mapToInt(Address::getPin)).boxed().collect(Collectors.toList());
+    }
+
+    public static Map<String, Set<Integer>> getCustomerNameWithPinCodes(List<Customer> customers) {
+        return customers.stream().collect(Collectors.toMap(Customer::getName, StreamOperations::getCustomerPinCodes, (a, b) -> a));
+    }
+
+    public static Set<Integer> getCustomerPinCodes(Customer customer) {
+        return customer.getAddresses().stream().mapToInt(Address::getPin).boxed().collect(Collectors.toSet());
     }
 
     public static Map<String, List<Address>> getSameStreet(List<Customer> customers) {
@@ -94,32 +110,29 @@ public class StreamOperations {
      * Stream Operations of List of Strings
      **/
     public static String convertToString(List<String> names, String separator) {
-        // Using Stream
         //return names.stream().collect(Collectors.joining(separator));
-
-        // Using String join
         return String.join(separator, names);
     }
 
     public static List<String> convertToList(String namesStr, String separator) {
-        //return Arrays.asList(namesStr.split(separator));
-        return Stream.of(namesStr.split(separator)).collect(Collectors.toList());
+        return List.of(namesStr.split(separator));
     }
 
     public static List<String> sortNames(List<String> names) {
-        return names.stream().sorted(Comparator.naturalOrder()).collect(Collectors.toList());
+        return names.stream().distinct().sorted().collect(Collectors.toList());
+        //return names.stream().sorted(Comparator.naturalOrder()).collect(Collectors.toList());
     }
 
     public static List<String> sortNamesDescending(List<String> names) {
-        return names.stream().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
+        return names.stream().distinct().sorted(Comparator.reverseOrder()).collect(Collectors.toList());
     }
 
-    public static List<String> limitNames(List<String> names, int limit) {
-        return names.stream().limit(limit).collect(Collectors.toList());
+    public static List<String> limitNames(List<String> names, int limitedTo) {
+        return names.stream().limit(limitedTo).collect(Collectors.toList());
     }
 
-    public static List<String> skipNames(List<String> names, int skip) {
-        return names.stream().skip(skip).collect(Collectors.toList());
+    public static List<String> skipNames(List<String> names, int skipUpto) {
+        return names.stream().skip(skipUpto).collect(Collectors.toList());
     }
 
     public static Map<String, List<String>> getFilterMap(String filterValue, String mapSeparator, String keyValueSeparator, String valueSeparator) {
@@ -136,10 +149,11 @@ public class StreamOperations {
         return resultMap;
     }
 
-    public static Map<Integer, String> getAlphabeticValueMap(Map<Integer, String> inputMap) {
+    public static Map<Integer, String> getOnlyAlphabeticValuesInMap(Map<Integer, String> inputMap) {
         // allMatch(Character::isDigit)) => for Numbers
-        return inputMap.entrySet().stream()
-                .filter(map -> StringUtils.isNotBlank(map.getValue()) && map.getValue().chars().allMatch(Character::isAlphabetic))
+        return inputMap.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().chars().allMatch(Character::isAlphabetic))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
@@ -152,27 +166,28 @@ public class StreamOperations {
 
     public static Map<Integer, Long> findFrequency(List<Integer> numbers) {
         return numbers.stream().collect(Collectors.groupingBy(number -> number, Collectors.counting()));
-       /* Set<Integer> set = new HashSet<>(numbers);
-        for (Integer number : set) {
-            System.out.println("Frequency: "+ number+ "=>" + Collections.frequency(numbers, number));
-        }*/
     }
 
     /**
      * Stream Operations on Employee problem solving
      **/
     // Sort by employee age and find max age
-    public static void sortEmployeeByAge(List<Employee> employees) {
-        List<Employee> result = employees.stream().sorted(Comparator.comparing(Employee::getAge)).collect(Collectors.toList());
-        log.info("Sort Employee: {}", result);
-        Integer maxAge = employees.stream().mapToInt(Employee::getAge).max().getAsInt();
-        log.info("Max age: {}", maxAge);
+    public static List<Employee> sortEmployeeByAge(List<Employee> employees) {
+        List<Employee> sortedEmployees = employees.stream().sorted(Comparator.comparing(Employee::getAge)).collect(Collectors.toList());
+        log.info("Max age of Employee: {}", sortedEmployees.stream().mapToInt(Employee::getAge).max().orElse(0));
+        return sortedEmployees;
     }
 
     // 0. Sort by emp name with descending order
-    public static List<Employee> sortEmployeeByName(List<Employee> employees){
-        return  employees.stream().sorted(Comparator.comparing(Employee::getName, Comparator.reverseOrder())).collect(Collectors.toList());
+    public static List<Employee> sortEmployeeByNameDesc(List<Employee> employees) {
+        return employees.stream().sorted(Comparator.comparing(Employee::getName, Comparator.reverseOrder())).collect(Collectors.toList());
     }
+
+    // get unique employees, Employee equals and hashcode implementation would be applicable for all properties by default
+    public static List<Employee> getUniqueEmployees(List<Employee> employees) {
+        return employees.stream().distinct().collect(Collectors.toList());
+    }
+
     // 1. How many male and female employees are there in the organization?
     public static Integer findEmpCount(List<Employee> employees, String gender) {
         return (int) employees.stream().filter(employee -> employee.getGender().equals(gender)).count();
@@ -182,10 +197,9 @@ public class StreamOperations {
         return employees.stream().collect(Collectors.groupingBy(Employee::getGender, Collectors.counting()));
     }
 
-    // 2. Print the name of all departments in the organization?
-    public static List<String> findAllDepartments(List<Employee> employees) {
-        //return employees.stream().map(Employee::getDepartment).collect(Collectors.toSet());
-        return employees.stream().map(Employee::getDepartment).distinct().collect(Collectors.toList());
+    // 2. Print the name of all departments in the organization with employee count?
+    public static Map<String, Long> findAllDepartments(List<Employee> employees) {
+        return employees.stream().collect(Collectors.groupingBy(Employee::getDepartment, Collectors.counting()));
     }
 
     // 3. What is the average age of male and female employees?
@@ -199,13 +213,20 @@ public class StreamOperations {
 
         return employees.stream().collect(Collectors.groupingBy(Employee::getGender, Collectors.averagingInt(Employee::getAge)));
     }
+    public static Map<String, Optional<Employee>> findMinAgeByDepartment(List<Employee> employees) {
+        return employees.stream().collect(Collectors.groupingBy(Employee::getDepartment, Collectors.minBy(Comparator.comparing(Employee::getAge))));
+    }
 
     // 4. Get the details of highest paid employee in the organization?
     public static Employee findHighestPaidEmployee(List<Employee> employees) {
         // max salary
         // return employees.stream().mapToDouble(employee -> employee.getSalary().doubleValue()).max().getAsDouble();
-        Optional<Employee> employee = employees.stream().max(Comparator.comparing(Employee::getSalary));
-        return employee.get();
+        return employees.stream().max(Comparator.comparing(Employee::getSalary)).orElse(Employee.builder().build());
+    }
+
+    // find highest paid employee by department
+    public static Map<String, Optional<Employee>> findHighestPaidEmployeeByDept(List<Employee> employees) {
+        return employees.stream().collect(Collectors.groupingBy(Employee::getDepartment, Collectors.maxBy(Comparator.comparing(Employee::getSalary))));
     }
 
     // 5. Get the names of all employees who have joined after 2015?
@@ -231,12 +252,8 @@ public class StreamOperations {
     }
 
     // 8 : Get the details of youngest male employee in the product development department?
-    public static Optional<Employee> getDeptYoungestMaleEmp(List<Employee> employees, String department, String gender) {
-          /*return employees.stream()
-                .filter(employee -> employee.getDepartment().equals(department))
-                .filter(employee -> employee.getGender().equals(gender))
-                .collect(Collectors.minBy(Comparator.comparing(Employee::getAge)));*/
-        return employees.stream().filter(employee -> employee.getDepartment().equals(department) && employee.getGender().equals(gender)).min(Comparator.comparing(Employee::getAge));
+    public static Map<String, Optional<Employee>> getDeptYoungestEmp(List<Employee> employees, String gender) {
+          return employees.stream().filter(employee -> employee.getGender().equals(gender)).collect(Collectors.groupingBy(Employee::getDepartment,Collectors.minBy(Comparator.comparing(Employee::getAge))));
     }
 
     // 9 : Who has the most working experience in the organization?
@@ -257,11 +274,9 @@ public class StreamOperations {
     // 12 : List down the names of all employees in each department?
     public static Map<String, List<String>> getNameListByDept(List<Employee> employees) {
         Map<String, List<String>> resultMap = new HashMap<>();
-        Map<String, List<Employee>> deptList = employees.stream().collect(Collectors.groupingBy(Employee::getDepartment));
-        /*deptList.entrySet().forEach(entry -> {
-            resultMap.put(entry.getKey(), entry.getValue().stream().map(Employee::getName).collect(Collectors.toList()));
-        });*/
-        deptList.forEach((key, value) -> resultMap.put(key, value.stream().map(Employee::getName).collect(Collectors.toList())));
+        //employees.stream().collect(Collectors.groupingBy(Employee::getDepartment, Collectors.toList())).forEach((key, value) -> resultMap.put(key, value.stream().map(Employee::getName).collect(Collectors.toList())) );
+        Map<String, List<Employee>> deptEmpMap = employees.stream().collect(Collectors.groupingBy(Employee::getDepartment, Collectors.toList()));
+        deptEmpMap.forEach((key, value) -> resultMap.put(key, value.stream().map(Employee::getName).collect(Collectors.toList())));
         return resultMap;
     }
 
@@ -298,14 +313,19 @@ public class StreamOperations {
             }
         }
     }
-
-    //15 : Who is the oldest employee in the organization? What is his age and which department he belongs to?
-    public static Optional<Employee> findOldestEmp(List<Employee> employees) {
-        return employees.stream().max(Comparator.comparing(Employee::getAge));
+    public static List<String> findYoungEmployeeNames(List<Employee> employees) {
+        return employees.stream().filter(employee -> employee.getAge() <= 25).map(Employee::getName).collect(Collectors.toList());
     }
 
-    public static Map<Integer, BigDecimal> mapEmpSalary(List<Employee> employees){
-        return employees.stream().collect(Collectors.toMap(Employee::getId , Employee::getSalary));
+    //15 : Who is the oldest employee in the organization? What is his age and which department he belongs to?
+    public static Employee findOldestEmp(List<Employee> employees) {
+        Employee oldestEmp = employees.stream().max(Comparator.comparing(Employee::getAge)).orElse(Employee.builder().build());
+        log.info("Oldest emp in organization Emp Name: {} , Age: {} , Dept: {}",oldestEmp.getName(), oldestEmp.getAge(), oldestEmp.getDepartment());
+        return oldestEmp;
+    }
+
+    public static Map<String, BigDecimal> mapEmpSalary(List<Employee> employees) {
+        return employees.stream().collect(Collectors.toMap(Employee::getName, Employee::getSalary));
     }
 
     /**
@@ -348,18 +368,28 @@ public class StreamOperations {
         //return one + System.lineSeparator() + two;
         return one + "\n" + two;
     }
-    public static boolean isHavingSpecialChars(String string){
+
+    public static boolean isHavingSpecialChars(String string) {
         Pattern pattern = Pattern.compile("[^a-z0-9 ]", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(string);
         return matcher.find();
     }
-    /** Asked in Mphasis**/
+
+    /**
+     * Asked in Mphasis
+     **/
     public static void findMostDuplicate(List<Integer> numbers) {
-        Map<Integer, Long> countMap = numbers.stream().collect(Collectors.groupingBy(Math::abs, Collectors.counting()));
+        Map<Integer, Long> countMap = numbers.stream().collect(Collectors.groupingBy(number -> number, Collectors.counting()));
         log.info("count Map: {}", countMap);
-        Map.Entry<Integer, Long> maxMap = countMap.entrySet().stream().max(Comparator.comparing(Map.Entry::getValue)).get();
+        Map.Entry<Integer, Long> maxMap = countMap.entrySet().stream().max(Map.Entry.comparingByValue()).get();
         log.info("Max Value Map: {}", maxMap);
         log.info("Max Count value: {}", countMap.values().stream().mapToInt(Math::toIntExact).max().getAsInt());
+    }
+
+    public static String findMostDuplicateString(List<String> names) {
+        return names.stream()
+                .collect(Collectors.groupingBy(name -> name, Collectors.counting()))
+                .entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
     }
 
 

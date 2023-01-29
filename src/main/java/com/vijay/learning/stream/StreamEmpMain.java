@@ -14,32 +14,38 @@ import static com.vijay.learning.utils.ApplicationUtils.buildEmployee;
 public class StreamEmpMain {
     public static void main(String[] args) {
         List<Employee> employees = constructEmployees();
-        sortEmployeeByAge(employees);
-        log.info("Sort employee descending name : {}", sortEmployeeByName(employees));
+        log.info("Sort employee by age : {}", sortEmployeeByAge(employees));
+        log.info("get unique employees size: {} and Employees: {}", getUniqueEmployees(employees).size(), getUniqueEmployees(employees));
+        log.info("Sort employee descending name : {}", sortEmployeeByNameDesc(employees));
         log.info("Employees Count {}", employees.size());
         log.info("Male Employee Count: {}", findEmpCount(employees, "Male"));
         log.info("Female Employee Count: {}", findEmpCount(employees, "Female"));
         log.info("Employee Count by Gender: {}", findEmployeeCountByGender(employees));
         log.info("Find Departments: {}", findAllDepartments(employees));
+        log.info("Find Departments Names: {}", findAllDepartments(employees).keySet());
         log.info("Find Average Age ByGender: {}", findAverageAgeByGender(employees));
+        log.info("Find Min Age Emp in Each Dept: {}", findMinAgeByDepartment(employees));
         log.info("Get Highest Paid Employee: {}", findHighestPaidEmployee(employees));
+        log.info("Get Highest Paid Employee from each Dept: {}", findHighestPaidEmployeeByDept(employees));
         log.info("Employee Names who joined after 2015: {}", getEmpNamesAfter2015(employees));
-        log.info("Employee Count Dept wise: {}", getEmpCountInDepartment(employees));
+        log.info("Employee Count Dept wise: {}", findAllDepartments(employees));
         log.info("Dept wise Avg Salary: {}", getAvgSalaryOfDepartment(employees));
-        log.info("Max salary Employee from each Dept: {}", getMaxSalaryEmpOfDepartment(employees));
-        log.info("Youngest male employee in the product development department: {}", getDeptYoungestMaleEmp(employees, "Product Development", "Male"));
+        log.info("Max salary Employee from each Dept: {}", findHighestPaidEmployeeByDept(employees));
+        log.info("Youngest male employee in each department: {}", getDeptYoungestEmp(employees, "Male"));
         log.info("Most Exp Emp: {}", getMostExpEmp(employees));
         log.info("Employee Count by Gender in  Sales And Marketing: {}", getEmpCountByGenderInDept(employees, "Sales And Marketing"));
         log.info("Employee Avg salary by Gender: {}", getAverageSalaryByGender(employees));
         log.info("Employee Name List by Dept: {}", getNameListByDept(employees));
         findSalaryStatics(employees);
-        separateYoungEmployees(employees);
+        log.info("Find Young emp Names List: {}", findYoungEmployeeNames(employees));
         log.info("Oldest Emp : {}", findOldestEmp(employees));
+        log.info("Get Emp Name and Salary of Map : {}", mapEmpSalary(employees));
     }
 
     private static List<Employee> constructEmployees() {
         List<Employee> employees = new ArrayList<>();
         employees.add(buildEmployee(111, "Jiya Brein", 32, "Female", "HR", 2011, BigDecimal.valueOf(25000.0)));
+        employees.add(buildEmployee(111, "Jiya Boss", 32, "Female", "HR", 2012, BigDecimal.valueOf(26000.0)));
         employees.add(buildEmployee(122, "Paul Niksui", 25, "Male", "Sales And Marketing", 2015, BigDecimal.valueOf(13500.0)));
         employees.add(buildEmployee(133, "Martin Theron", 29, "Male", "Infrastructure", 2012, BigDecimal.valueOf(18000.0)));
         employees.add(buildEmployee(144, "Murali Gowda", 28, "Male", "Product Development", 2014, BigDecimal.valueOf(32500.0)));
