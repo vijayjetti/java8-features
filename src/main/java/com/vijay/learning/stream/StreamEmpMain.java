@@ -19,7 +19,7 @@ public class StreamEmpMain {
         log.info("Sort employee descending name : {}", sortEmployeeByNameDesc(employees));
         log.info("Employees Count {}", employees.size());
         log.info("Male Employee Count: {}", findEmpCount(employees, "Male"));
-        log.info("Emp Name: VJY:: "+ getEmpName(employees));
+        log.info("Emp Name: "+ getEmpName(employees));
         log.info("Female Employee Count: {}", findEmpCount(employees, "Female"));
         log.info("Employee Count by Gender: {}", findEmployeeCountByGender(employees));
         log.info("Find Departments: {}", findAllDepartments(employees));
