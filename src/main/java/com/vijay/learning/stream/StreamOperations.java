@@ -171,6 +171,9 @@ public class StreamOperations {
     /**
      * Stream Operations on Employee problem solving
      **/
+    public static String getEmpName(List<Employee> employees) {
+     return employees.get(0).getName();
+    }
     // Sort by employee age and find max age
     public static List<Employee> sortEmployeeByAge(List<Employee> employees) {
         List<Employee> sortedEmployees = employees.stream().sorted(Comparator.comparing(Employee::getAge)).collect(Collectors.toList());
